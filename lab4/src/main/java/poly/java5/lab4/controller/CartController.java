@@ -8,6 +8,7 @@ import poly.java5.lab4.model.Item;
 import poly.java5.lab4.service.CartServiceImpl;
 import poly.java5.lab4.service.CartServiceInterface;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Controller
@@ -42,13 +43,22 @@ public class CartController {
     }
 
     @PostMapping("/update/{id}")
-    public String update(@PathVariable int id, @RequestParam("quantity") int quantity, Model model){
-        if(quantity<0){
+    public String update(@PathVariable int id, @RequestParam("quantity") String quantity, Model model){
+        int quan = 1;
+        Item item;
+        try{
+            quan = Integer.parseInt(quantity);
+            item = service.getOneByID(id, shopItems);
+        }catch (Exception e){
+            e.printStackTrace();
+            model.addAttribute("mess", "Vui lòng nhập số lượng là số!");
+            return "cart/index";
+        }
+        if(quan<0){
             model.addAttribute("mess", "Số lượng phải lớn hơn 0!");
             return "cart/index";
         }
-        Item item = service.getOneByID(id, shopItems);
-        service.update(item, quantity);
+        service.update(item, quan);
         return "cart/index";
     }
 
